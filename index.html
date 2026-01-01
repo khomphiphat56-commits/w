@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anniversary 💜</title>
+
+<style>
+:root{
+  --bg1:#f2edff;
+  --bg2:#e6ddff;
+  --bg3:#f6f1ff;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+  overflow:hidden;
+  font-family:system-ui;
+}
+
+/* ================== ลอย ================== */
+.bg{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+}
+
+.floating{
+  position:absolute;
+  bottom:-60px;
+  font-size:20px;
+  animation:rise linear forwards;
+  opacity:.8;
+}
+
+.float-img{
+  position:absolute;
+  bottom:-80px;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  object-fit:cover;
+  animation:rise linear forwards;
+  opacity:.9;
+}
+
+@keyframes rise{
+  from{transform:translateY(0) scale(.9);opacity:0}
+  20%{opacity:1}
+  to{transform:translateY(-120vh) scale(1.2);opacity:0}
+}
+
+/* ================== main (เดิม) ================== */
+.main{
+  position:relative;
+  z-index:10;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  transition:1s;
+}
+.main.show{opacity:1}
+
+.card{
+  background:rgba(255,255,255,.9);
+  padding:50px 36px;
+  border-radius:50px;
+  text-align:center;
+  box-shadow:0 40px 120px rgba(140,120,255,.35);
+}
+
+.photo{
+  width:180px;height:180px;
+  margin:0 auto 20px;
+  border-radius:50%;
+  overflow:hidden;
+  border:6px solid #fff;
+}
+.photo img{width:100%;height:100%;object-fit:cover}
+
+h2{color:#5a4ca8}
+.names{color:#6f63b8}
+.badge{
+  margin:14px auto;
+  padding:10px 26px;
+  border-radius:30px;
+  background:linear-gradient(135deg,#a28cff,#d0c3ff);
+  color:#fff;
+  display:inline-block;
+}
+#loveTime{margin-top:14px;color:#666}
+
+/* ================== ใส่รหัส ================== */
+#gateOverlay{
+  position:fixed;inset:0;
+  background:linear-gradient(135deg,#cdbbff,#ece6ff);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.gateBox{
+  background:rgba(255,255,255,.25);
+  backdrop-filter:blur(25px);
+  padding:40px;
+  border-radius:40px;
+  text-align:center;
+}
+.gateBox input{
+  width:100%;
+  padding:14px;
+  border-radius:30px;
+  border:none;
+  font-size:18px;
+  text-align:center;
+}
+.gateBox button{
+  margin-top:20px;
+  padding:14px 40px;
+  border:none;
+  border-radius:30px;
+  font-size:18px;
+}
+
+/* ================== หลอดหัวใจ ================== */
+#heartOverlay{
+  position:fixed;inset:0;
+  background:linear-gradient(135deg,#b7a6ff,#e3dcff);
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  color:#fff;
+}
+.heartShape{
+  width:260px;height:240px;
+  background:#fff;
+  clip-path:path("M130 30 C130 -10 0 -10 0 80 C0 160 130 220 130 220 C130 220 260 160 260 80 C260 -10 130 -10 130 30 Z");
+  overflow:hidden;
+}
+.heartFill{
+  position:absolute;
+  bottom:0;
+  width:260px;
+  height:0%;
+  background:linear-gradient(#7a5cff,#b79bff);
+  transition:height .3s;
+}
+
+/* ================== พลุ ================== */
+#fireworkOverlay{
+  position:fixed;inset:0;
+  background:black;
+  z-index:9999;
+  display:none;
+}
+.firework{
+  position:absolute;
+  width:6px;height:6px;
+  border-radius:50%;
+  animation:boom 1.2s forwards;
+}
+@keyframes boom{
+  from{transform:scale(0);opacity:1}
+  to{transform:scale(6);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg" id="bg"></div>
+
+<div id="gateOverlay">
+  <div class="gateBox">
+    <h2>ใส่รหัส 💜</h2>
+    <input id="passInput" type="password">
+    <button onclick="checkPass()">ยืนยัน</button>
+  </div>
+</div>
+
+<div id="heartOverlay">
+  <div style="position:relative">
+    <div class="heartShape">
+      <div class="heartFill" id="heartFill"></div>
+    </div>
+  </div>
+  <p>แตะเพื่อเติมหัวใจ</p>
+</div>
+
+<div id="fireworkOverlay"></div>
+
+<div class="main" id="main">
+  <div class="card">
+    <div class="photo">
+      <img src="main.jpg">
+    </div>
+    <h2>Happy Anniversary</h2>
+    <div class="names">เอิร์ท 🤍 น้องโอปอ</div>
+    <div class="badge">08/02/25</div>
+    <div id="loveTime"></div>
+  </div>
+</div>
+
+<script>
+/* ===== ลอย ===== */
+const icons=["💜","🌸","🌼","💐"];
+setInterval(()=>{
+  const el=document.createElement("div");
+  el.className="floating";
+  el.textContent=icons[Math.floor(Math.random()*icons.length)];
+  el.style.left=Math.random()*100+"vw";
+  el.style.animationDuration=6+Math.random()*6+"s";
+  bg.appendChild(el);
+  setTimeout(()=>el.remove(),12000);
+},500);
+
+/* ===== รหัส ===== */
+const PASSWORD="080225";
+function checkPass(){
+  if(passInput.value===PASSWORD){
+    gateOverlay.style.display="none";
+    heartOverlay.style.display="flex";
+  }else alert("รหัสไม่ถูก");
+}
+
+/* ===== หัวใจ ===== */
+let fill=0;
+heartOverlay.onclick=()=>{
+  fill+=5;
+  if(fill>100)fill=100;
+  heartFill.style.height=fill+"%";
+  if(fill===100) startFirework();
+};
+
+/* ===== พลุ ===== */
+function startFirework(){
+  heartOverlay.style.display="none";
+  fireworkOverlay.style.display="block";
+  const sound=new Audio("https://actions.google.com/sounds/v1/explosions/fireworks_burst.ogg");
+  sound.play();
+  for(let i=0;i<40;i++){
+    const f=document.createElement("div");
+    f.className="firework";
+    f.style.left=Math.random()*100+"vw";
+    f.style.top=Math.random()*100+"vh";
+    f.style.background=`hsl(${Math.random()*360},100%,70%)`;
+    fireworkOverlay.appendChild(f);
+    setTimeout(()=>f.remove(),1200);
+  }
+  setTimeout(()=>{
+    fireworkOverlay.style.display="none";
+    main.classList.add("show");
+  },2000);
+}
+
+/* ===== เวลา ===== */
+function updateLoveTime(){
+  const start=new Date(2025,1,8,7,40,0);
+  const now=new Date();
+  let d=Math.floor((now-start)/1000);
+  const day=Math.floor(d/86400);d%=86400;
+  const h=Math.floor(d/3600);d%=3600;
+  const m=Math.floor(d/60);const s=d%60;
+  loveTime.innerHTML=`${day} วัน ${h} ชม ${m} นาที ${s} วิ`;
+}
+setInterval(updateLoveTime,1000);updateLoveTime();
+</script>
+
+</body>
+</html>
